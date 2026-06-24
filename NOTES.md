@@ -17,3 +17,37 @@ I used GitHub Copilot as a pair programmer throughout this task. I shared the RE
 After I created a Supabase account, I then proceeded to the implementation of the tasks step-by-step. From the creating new SQL migration scripts, to the API route implementation, to setting up PostMan requests to test the notes api, and finally writing the test cases.
 
 
+## Call the notes route:
+Step 1: Start the dev server
+Step 2: Create a test user in Supabase Auth
+Then run this SQL in Supabase's SQL editor to add them to memberships with their real auth UID:
+```sql
+-- Replace <real-auth-uid> with the UUID from the Auth dashboard
+insert into users (id, email) values ('<real-auth-uid>', 'alice-auth@acme.test')
+  on conflict do nothing;
+insert into memberships (user_id, group_id) values
+  ('<real-auth-uid>', '11111111-1111-1111-1111-111111111111');
+```
+Step 3 Get a JWT Token by making a POST to Supabase's auth endpoint:
+POST https://<your-project-ref>.supabase.co/auth/v1/token?grant_type=password
+Headers:
+apikey: <your-anon-key>
+Content-Type: application/json
+Body:
+{
+  "email": "alice-auth@acme.test",
+  "password": "yourpassword"
+}
+Step 4: Call your notes:
+GET http://localhost:3000/api/notes
+Authorization: Bearer <access_token>
+
+POST /api/notes
+POST http://localhost:3000/api/notes
+Authorization: Bearer <access_token>
+Content-Type: application/json
+
+{
+  "group_id": "11111111-1111-1111-1111-111111111111",
+  "body": "My first note"
+}
